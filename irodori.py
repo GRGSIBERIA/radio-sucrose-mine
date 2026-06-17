@@ -1,7 +1,20 @@
 import requests
 from typing import List, Dict
 from pprint import pprint
+from openai import OpenAI
 
+from io import BytesIO
+import sounddevice as sd
+import soundfile as sf
+
+from logging import getLogger
+
+tts_client = OpenAI(
+    base_url="http://localhost:8088/v1",
+    api_key="dummy"
+)
+
+logger = getLogger(__name__)
 
 def separate_lines(contents:str) -> List[Dict[str, str]]:
     # 空白行を取り除いて行単位で分ける
@@ -14,14 +27,36 @@ def separate_lines(contents:str) -> List[Dict[str, str]]:
             "name": sep[0],
             "comment": sep[1]
         }
-    
+
     return lines
+
+
+def speak_content(name:str, content:str):
+    
+    with tts_client.audio.speech.with_raw_response.create(
+        model="irodori-tts",
+        voice=name,
+        input=content,
+        response_format="wav",
+        speed=1.0
+    ) as response:
+        audio_bytes = response.read()
+
+    logger.info(content)
+    
+    audio_data, sample_rate = sf.read(BytesIO(audio_bytes), dtype="float32")
+    sd.play(audio_data, sample_rate)
+    sd.wait()
 
 
 def play_contents(contents:str):
     lines = separate_lines(contents)
+
+    for line in lines:
+        speak_content(line["name"], line["comment"])
     
     pprint(lines)
+
 
 if __name__ == "__main__":
     contents = """
