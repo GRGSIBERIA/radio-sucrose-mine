@@ -33,6 +33,13 @@ def separate_lines(contents:str) -> List[Dict[str, str]]:
 
 def speak_content(name:str, content:str):
     
+    if name == "A":
+        name = "sucrose"
+    elif name == "B":
+        name = "dori"
+    else:
+        raise Exception("AB以外の文字列が飛んでいる")
+
     with tts_client.audio.speech.with_raw_response.create(
         model="irodori-tts",
         voice=name,
@@ -43,7 +50,7 @@ def speak_content(name:str, content:str):
         audio_bytes = response.read()
 
     logger.info(content)
-    
+
     audio_data, sample_rate = sf.read(BytesIO(audio_bytes), dtype="float32")
     sd.play(audio_data, sample_rate)
     sd.wait()
