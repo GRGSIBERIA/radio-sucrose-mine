@@ -40,14 +40,15 @@ def speak_content(name:str, content:str):
     else:
         raise Exception("AB以外の文字列が飛んでいる")
 
-    with tts_client.audio.speech.with_raw_response.create(
+    response = tts_client.audio.speech.with_raw_response.create(
         model="irodori-tts",
         voice=name,
         input=content,
         response_format="wav",
         speed=1.0
-    ) as response:
-        audio_bytes = response.read()
+    )
+    
+    audio_bytes = response.read()
 
     logger.info(content)
 
