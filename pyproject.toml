@@ -1,6 +1,7 @@
 [project]
 name = "radio-sucrose-v2"
 version = "2.0"
+requires-python = ">=3.11"
 
 dependencies = [
     "requests",
