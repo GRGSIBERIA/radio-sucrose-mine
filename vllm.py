@@ -2,7 +2,10 @@ from openai import OpenAI
 
 with open("prompt.txt", "rt", encoding="utf-8") as f:
     SYSTEM_PROMPT = f.read()
-    
+with open("ref/dori.txt", "rt", encoding="utf-8") as f:
+    SYSTEM_PROMPT = SYSTEM_PROMPT.replace("{dori.txt}", f.read() + "\n\n")
+with open("ref/sucrose.txt", "rt", encoding="utf-8") as f:
+    SYSTEM_PROMPT = SYSTEM_PROMPT.replace("{sucrose.txt}", f.read() + "\n\n")
 
 def get_free_talk(client: OpenAI, user_prompt: str) -> str:
     response = client.chat.completions.create(
@@ -25,6 +28,7 @@ def get_free_talk(client: OpenAI, user_prompt: str) -> str:
 
 
 if __name__ == "__main__":
+    # vLLMのデフォルトは8000
     client = OpenAI(
         base_url="http://localhost:8000/v1",
         api_key="dummy"
