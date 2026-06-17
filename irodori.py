@@ -1,9 +1,9 @@
 import requests
+from typing import List, Dict
 from pprint import pprint
 
 
-
-def play_contents(contents:str):
+def separate_lines(contents:str) -> List[Dict[str, str]]:
     # 空白行を取り除いて行単位で分ける
     lines = [s.strip() for s in contents.split("\n") if not s.strip() == ""]
     
@@ -14,6 +14,12 @@ def play_contents(contents:str):
             "name": sep[0],
             "comment": sep[1]
         }
+    
+    return lines
+
+
+def play_contents(contents:str):
+    lines = separate_lines(contents)
     
     pprint(lines)
 
