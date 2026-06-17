@@ -21,12 +21,13 @@ def get_free_talk(client: OpenAI, user_prompt: str) -> str:
             }
         ],
         temperature=0.7,
-        max_tokens=4096,
+        max_tokens=1024,
         extra_body={
             "chat_template_kwargs": {
                 "enable_thinking": False
             }
-        }
+        },
+        timeout=300
     )
 
     return response.choices[0].message.content
