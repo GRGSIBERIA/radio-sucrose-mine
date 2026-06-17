@@ -48,7 +48,7 @@ def speak_content(name:str, content:str):
         speed=1.0
     )
     
-    audio_bytes = response.read()
+    audio_bytes = response.content
 
     logger.info(content)
 
