@@ -25,6 +25,7 @@ def get_free_talk(client: OpenAI, user_prompt: str) -> str:
 
 
 if __name__ == "__main__":
+    # vLLMのデフォルトは8000
     client = OpenAI(
         base_url="http://localhost:8000/v1",
         api_key="dummy"
