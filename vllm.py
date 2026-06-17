@@ -2,9 +2,9 @@ from openai import OpenAI
 
 with open("prompt.txt", "rt", encoding="utf-8") as f:
     SYSTEM_PROMPT = f.read()
-with open("ref/dori.txt", "rt", encoding="utf-8") as f:
+with open("refs/dori.txt", "rt", encoding="utf-8") as f:
     SYSTEM_PROMPT = SYSTEM_PROMPT.replace("{dori.txt}", f.read() + "\n\n")
-with open("ref/sucrose.txt", "rt", encoding="utf-8") as f:
+with open("refs/sucrose.txt", "rt", encoding="utf-8") as f:
     SYSTEM_PROMPT = SYSTEM_PROMPT.replace("{sucrose.txt}", f.read() + "\n\n")
 
 def get_free_talk(client: OpenAI, user_prompt: str) -> str:
