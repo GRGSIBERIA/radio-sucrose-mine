@@ -55,18 +55,45 @@ def get_first_article(url):
 
 def get_second_article(url):
     text = requests.get(url).text
-    soup = BeautifulSoup(text, "html.parser")
+    tree = html.fromstring(text)
+    nodes = tree.xpath('//*[@id="uamods"]/div[1]/div/p')
+
+    texts = [
+        p.text_content().strip()
+        for p in nodes
+        if p.text_content().strip()
+    ]
+    body = "\n\n".join(texts)
+
+    return body
 
 
 def get_article_text():
+    """ニュースフィードからランダムに1件のニュースを取得する
+
+    Returns:
+        Hash: 様々なデータが入っている
+            first_url: 全文読む前のURLが入ってる
+            content: 記事が入っている
+            title: タイトルが入っている
+            pubDate: 出版時期が入っている
+    """
     url = random.choice(RSS_TOPICS_URL)
     page = requests.get(url).text
 
     meta = xml2content(page)
-    meta["first"] = get_first_article(meta["url"])
+    meta["first_url"] = get_first_article(meta["url"])
+    meta["content"] = get_second_article(meta["first_url"])
 
     return meta
 
 
 if __name__ == "__main__":
-    print(get_article_text())
+    import time
+
+    while True:
+        try:
+            print(get_article_text())
+            time.sleep(10.)
+        except Exception as e:
+            print(e)
