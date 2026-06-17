@@ -7,5 +7,7 @@ dependencies = [
     "requests",
     "beautifulsoup4",
     "lxml",
-    "openai"
+    "openai",
+    "sounddevice",
+    "soundfile"
 ]
