@@ -1,3 +1,4 @@
+from typing import Dict
 import random
 import requests
 import xml.etree.ElementTree as ET
@@ -68,7 +69,7 @@ def get_second_article(url):
     return body
 
 
-def get_article_text():
+def get_article_text() -> Dict[str, str]:
     """ニュースフィードからランダムに1件のニュースを取得する
 
     Returns:
