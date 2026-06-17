@@ -1,0 +1,10 @@
+[project]
+name = "radio-sucrose-v2"
+version = "2.0"
+
+dependencies = [
+    "requests",
+    "beautifulsoup4",
+    "lxml",
+    "openai"
+]
