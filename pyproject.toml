@@ -10,5 +10,6 @@ dependencies = [
     "openai",
     "sounddevice",
     "soundfile",
-    "loguru"
+    "loguru",
+    "obs-websocket-py"
 ]
