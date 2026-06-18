@@ -11,5 +11,6 @@ dependencies = [
     "sounddevice",
     "soundfile",
     "loguru",
-    "obs-websocket-py"
+    "obs-websocket-py",
+    "pysqlite3",
 ]
