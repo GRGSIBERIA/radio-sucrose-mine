@@ -9,5 +9,6 @@ dependencies = [
     "lxml",
     "openai",
     "sounddevice",
-    "soundfile"
+    "soundfile",
+    "loguru"
 ]
