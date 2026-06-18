@@ -7,14 +7,13 @@ from io import BytesIO
 import sounddevice as sd
 import soundfile as sf
 
-from logging import getLogger
+from loguru import logger
 
 tts_client = OpenAI(
     base_url="http://localhost:8088/v1",
     api_key="dummy"
 )
 
-logger = getLogger(__name__)
 
 def separate_lines(contents:str) -> List[Dict[str, str]]:
     # 空白行を取り除いて行単位で分ける
@@ -50,7 +49,7 @@ def speak_content(name:str, content:str):
     
     audio_bytes = response.content
 
-    logger.info(content)
+    logger.info("\n" + content)
 
     audio_data, sample_rate = sf.read(BytesIO(audio_bytes), dtype="float32")
     sd.play(audio_data, sample_rate)

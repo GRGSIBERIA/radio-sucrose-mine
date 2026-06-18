@@ -1,4 +1,6 @@
 from openai import OpenAI
+from loguru import logger
+
 
 with open("prompt.txt", "rt", encoding="utf-8") as f:
     SYSTEM_PROMPT = f.read()
@@ -30,7 +32,12 @@ def get_free_talk(client: OpenAI, user_prompt: str) -> str:
         timeout=300
     )
 
-    return response.choices[0].message.content
+    content = response.choices[0].message.content
+    logger.info(f"prompt tokens:    {response.usage.prompt_tokens}")
+    logger.info(f"completion tokens:{response.usage.completion_tokens}")
+    logger.info(f"total tokens:     {response.usage.total_tokens}")
+
+    return content
 
 
 if __name__ == "__main__":
