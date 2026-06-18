@@ -59,8 +59,9 @@ def speak_content(name:str, content:str):
 def play_contents(contents:str):
     lines = separate_lines(contents)
 
-    for line in lines:
+    for i, line in enumerate(lines):
         speak_content(line["name"], line["comment"])
+        logger.info(f"{i+1}/{len(lines)}")
     
     pprint(lines)
 
