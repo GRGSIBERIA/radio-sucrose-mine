@@ -37,18 +37,6 @@ def get_xml_items(content:str) -> List[Dict[str,str]]:
     return retval
 
 
-def xml2content(content:str):
-    """メタデータのコンテンツをランダムに返す
-    return: Hash
-        link: link data
-        title: title
-        pubDate: published date
-    """
-    retval = get_xml_items(content)
-    
-    return random.choice(retval)
-
-
 def get_article(url):
     text = requests.get(url).text
     tree = html.fromstring(text)
