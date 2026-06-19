@@ -114,6 +114,17 @@ def get_one_offset_article(conn:sqlite3.Connection, offset:int):
     ).fetchone()
 
 
+def update_record_for_readed(conn:sqlite3.Connection, url:str):
+    conn.execute(
+        """
+        UPDATE articles
+        SET is_readed = 1
+        WHERE url = ?
+        """,
+        (url,),
+    )
+
+
 def get_article_text(conn:sqlite3.Connection=None) -> Dict[str, str]:
     """ニュースフィードからランダムに1件のニュースを取得する
 
@@ -165,6 +176,11 @@ def get_article_text(conn:sqlite3.Connection=None) -> Dict[str, str]:
         meta["first_url"] = get_first_article(url)
         meta["content"] = get_second_article(meta["first_url"])
         logger.info(f"{title}")
+
+        with conn:
+            logger.info("Update is_readed=1")
+            update_record_for_readed(conn, url)
+        
 
     return meta["content"]
 
@@ -225,7 +241,7 @@ if __name__ == "__main__":
             while True:
                 try:
                     get_article_text(conn)
-                    time.sleep(10.)
+                    #time.sleep(10.)
                 except Exception as e:
                     print(e)
 
