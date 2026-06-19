@@ -34,10 +34,10 @@ if __name__ == "__main__":
             ws.connect()
 
             ws_call(ws, "記事を取得中")
-            article = get_article_text()
+            article_text = get_article_text()
 
             ws_call(ws, "トークを生成中")
-            talk_text = get_free_talk(client, article["content"])
+            talk_text = get_free_talk(client, article_text)
 
             ws_call(ws, "再生中")
             play_contents(talk_text)

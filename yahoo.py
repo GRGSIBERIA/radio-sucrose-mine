@@ -166,7 +166,7 @@ def get_article_text(conn:sqlite3.Connection=None) -> Dict[str, str]:
         meta["content"] = get_second_article(meta["first_url"])
         logger.info(f"{title}")
 
-    return meta
+    return meta["content"]
 
 
 def init_table(conn: sqlite3.Connection) -> None:
