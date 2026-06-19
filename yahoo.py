@@ -29,16 +29,20 @@ def get_xml_items(content:str) -> List[Dict[str,str]]:
     retval = []
 
     for item in items:
-        retval.append({
-            "url": item.find("comments").text.replace("/comments", ""),
-            "title": item.find("title").text,
-            "pubDate": item.find("pubDate").text
-        })
+        try:
+            retval.append({
+                "url": item.find("comments").text.replace("/comments", ""),
+                "title": item.find("title").text,
+                "pubDate": item.find("pubDate").text
+            })
+        except:
+            continue
     return retval
 
 
 def get_article(url):
-    text = requests.get(url).text
+    req = requests.get(url)
+    text = req.text
     tree = html.fromstring(text)
     nodes = tree.xpath('//*[@id="uamods"]/div[1]/div/p')
     logger.info(f"An article content length: {len(text)}")
@@ -178,6 +182,7 @@ def get_rss_all_articles(conn:sqlite3.Connection):
         page = requests.get(url)
         items += get_xml_items(page.text)
     
+    logger.info(f"Insert articles: {len(items)}")
     insert_articles(conn, items)
 
 
