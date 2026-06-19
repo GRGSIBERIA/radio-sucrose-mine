@@ -30,7 +30,7 @@ def get_xml_items(content:str) -> List[Dict[str,str]]:
 
     for item in items:
         retval.append({
-            "url": item.find("link").text,
+            "url": item.find("comments").text.replace("/comments", ""),
             "title": item.find("title").text,
             "pubDate": item.find("pubDate").text
         })
@@ -49,26 +49,11 @@ def xml2content(content:str):
     return random.choice(retval)
 
 
-def get_first_article(url):
-    text = requests.get(url).text
-    soup = BeautifulSoup(text, "html.parser")
-    logger.info(f"1st article content length: {len(text)}")
-
-    a_tag = soup.find("a", string=lambda text: text and "記事全文を読む" in text)
-
-    if a_tag is not None:
-        href = a_tag.get("href")
-    else:
-        logger.critical("「記事全文を読む」が見つかりませんでした")
-
-    return href
-
-
-def get_second_article(url):
+def get_article(url):
     text = requests.get(url).text
     tree = html.fromstring(text)
     nodes = tree.xpath('//*[@id="uamods"]/div[1]/div/p')
-    logger.info(f"2nd article content length: {len(text)}")
+    logger.info(f"An article content length: {len(text)}")
 
     texts = [
         p.text_content().strip()
@@ -138,51 +123,38 @@ def get_article_text(conn:sqlite3.Connection=None) -> Dict[str, str]:
             - title: タイトルが入っている
             - pubDate: 出版時期が入っている
     """
-    meta = {}
     
-    if conn == None:
-        url = random.choice(RSS_TOPICS_URL)
-        page = requests.get(url).text
-        logger.info(f"get RSS feed: {url}")
+    row = get_select_one_item(conn)
 
-        meta = xml2content(page)
-        logger.info(f"title: {meta['title']}")
-        logger.info(f"publish date: {meta['pubDate']}")
-        logger.info(f"url: {meta['url']}")
-        meta["first_url"] = get_first_article(meta["url"])
-        meta["content"] = get_second_article(meta["first_url"])
-    
-    if type(conn) == sqlite3.Connection:
-        row = get_select_one_item(conn)
-
-        if row == None:
-            logger.warning("Not readed articles not found")
-            logger.info("Fetching new articles")
-            with conn:
-                get_all_articles(conn)
-        
-        row = get_select_one_item(conn)
-
-        if row == None:
-            logger.warning("Can't fetch new articles")
-            logger.info("Get randon article")
-            unread_count = count_all_articles(conn)
-
-            offset = random.randrange(unread_count)
-            row = get_one_offset_article(conn, offset)
-
-        url, title, _ = row
-
-        meta["first_url"] = get_first_article(url)
-        meta["content"] = get_second_article(meta["first_url"])
-        logger.info(f"{title}")
-
+    # 記事が全くなかった
+    if row == None:
+        logger.warning("Not readed articles not found")
+        logger.info("Fetching new articles")
         with conn:
-            logger.info("Update is_readed=1")
-            update_record_for_readed(conn, url)
-        
+            get_rss_all_articles(conn)
+    
+        row = get_select_one_item(conn)
 
-    return meta["content"]
+    # is_readed=0が1件もなかった
+    if row == None:
+        logger.warning("Can't fetch new articles")
+        logger.info("Get randon article")
+
+        unread_count = count_all_articles(conn)
+        offset = random.randrange(unread_count)
+        row = get_one_offset_article(conn, offset)
+
+    url, title, _ = row
+
+    article_text = get_article(url)
+    logger.info(f"Title: {title}")
+    logger.info(f"Article Size: {len(article_text)}")
+
+    with conn:
+        logger.info("Update is_readed=1")
+        update_record_for_readed(conn, url)
+
+    return article_text
 
 
 def init_table(conn: sqlite3.Connection) -> None:
@@ -212,7 +184,7 @@ def insert_articles(conn:sqlite3.Connection, items:List[Dict[str,str]]):
     )
 
 
-def get_all_articles(conn:sqlite3.Connection):
+def get_rss_all_articles(conn:sqlite3.Connection):
     items = []
     for url in RSS_TOPICS_URL:
         page = requests.get(url)
@@ -221,11 +193,11 @@ def get_all_articles(conn:sqlite3.Connection):
     insert_articles(conn, items)
 
 
-def get_articles_first_time():
+def get_rss_articles_first_time():
     with closing(sqlite3.connect(DB_PATH)) as conn:
         with conn:
             init_table(conn)
-            get_all_articles(conn)
+            get_rss_all_articles(conn)
         count = count_all_articles(conn)
         logger.success(f"Got articles count is {count}")
 
@@ -234,7 +206,7 @@ if __name__ == "__main__":
     import time
     DEBUG_SQL = True
     if DEBUG_SQL == True:
-        get_articles_first_time()
+        get_rss_articles_first_time()
 
         with closing(sqlite3.Connection(DB_PATH)) as conn:
 
