@@ -121,7 +121,7 @@ def update_record_for_readed(conn:sqlite3.Connection, url:str):
         SET is_readed = 1
         WHERE url = ?
         """,
-        (url,),
+        (url),
     )
 
 
