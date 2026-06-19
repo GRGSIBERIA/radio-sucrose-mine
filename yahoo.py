@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict,List
 import random
 import requests
 import xml.etree.ElementTree as ET
@@ -21,13 +21,7 @@ RSS_TOPICS_URL = [
 ]
 
 
-def xml2content(content):
-    """メタデータのコンテンツを返す
-    return: Hash
-        link: link data
-        title: title
-        pubDate: published date
-    """
+def get_xml_items(content:str) -> List[Dict[str,str]]:
     root = ET.fromstring(content)
     items = root.findall("./channel/item")
 
@@ -39,6 +33,17 @@ def xml2content(content):
             "title": item.find("title").text,
             "pubDate": item.find("pubDate").text
         })
+    return retval
+
+
+def xml2content(content:str):
+    """メタデータのコンテンツを返す
+    return: Hash
+        link: link data
+        title: title
+        pubDate: published date
+    """
+    retval = get_xml_items(content)
     
     return random.choice(retval)
 
@@ -113,13 +118,33 @@ def init_table(conn: sqlite3.Connection) -> None:
     """)
 
 
+def insert_articles(conn:sqlite3.Connection, items:List[Dict[str,str]]):
+    conn.executemany(
+        """
+        INSERT OR IGNORE INTO articles (url, title, is_readed)
+        VALUES (?, ?, 0)
+        """,
+        [
+            (item["url"], item["title"])
+            for item in items
+        ],
+    )
+
+
+def get_all_articles(conn:sqlite3.Connection):
+    items = []
+    for url in RSS_TOPICS_URL:
+        page = requests.get(url)
+        items += get_xml_items(page.text)
+    
+    insert_articles(conn, items)
+
+
 def get_articles_first_time():
     with closing(sqlite3.connect("./articles.db")) as conn:
-        init_table(conn)
-
         with conn:
-            pass
-
+            init_table(conn)
+            get_all_articles(conn)
 
 
 if __name__ == "__main__":
