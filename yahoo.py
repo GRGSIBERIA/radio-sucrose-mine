@@ -83,14 +83,14 @@ def get_second_article(url):
 
 def get_select_one_item(conn:sqlite3.Connection):
     return conn.execute(
-            """
-            SELECT url, title, is_readed
-            FROM articles
-            WHERE is_readed = 0
-            ORDER BY RANDOM()
-            LIMIT 1
-            """
-        ).fetchone()
+        """
+        SELECT url, title, is_readed
+        FROM articles
+        WHERE is_readed = 0
+        ORDER BY RANDOM()
+        LIMIT 1
+        """
+    ).fetchone()
 
 
 def count_all_articles(conn:sqlite3.Connection) -> int:
