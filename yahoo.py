@@ -5,6 +5,8 @@ import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
 from lxml import html
 from loguru import logger
+import sqlite3
+from contextlib import closing
 
 RSS_TOPICS_URL = [
     "https://news.yahoo.co.jp/rss/topics/top-picks.xml",
@@ -97,12 +99,39 @@ def get_article_text() -> Dict[str, str]:
     return meta
 
 
+def init_table(conn: sqlite3.Connection) -> None:
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS articles (
+            url TEXT UNIQUE NOT NULL,
+            title TEXT NOT NULL,
+            is_readed INTEGER NOT NULL DEFAULT 0
+        )
+    """)
+    conn.execute("""
+        CREATE INDEX IF NOT EXISTS idx_articles_is_readed_url
+        ON articles (is_readed, url)
+    """)
+
+
+def get_articles_first_time():
+    with closing(sqlite3.connect("./articles.db")) as conn:
+        init_table(conn)
+
+        with conn:
+            pass
+
+
+
 if __name__ == "__main__":
     import time
-
-    while True:
-        try:
-            get_article_text()
-            time.sleep(10.)
-        except Exception as e:
-            print(e)
+    DEBUG_SQL = True
+    if DEBUG_SQL == True:
+        pass
+    else:
+        if DEBUG_SQL == False:
+            while True:
+                try:
+                    get_article_text()
+                    time.sleep(10.)
+                except Exception as e:
+                    print(e)
