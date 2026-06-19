@@ -63,8 +63,6 @@ def play_contents(contents:str):
         speak_content(line["name"], line["comment"])
         logger.info(f"{i+1}/{len(lines)}")
     
-    pprint(lines)
-
 
 if __name__ == "__main__":
     contents = """
