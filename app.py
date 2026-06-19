@@ -1,4 +1,4 @@
-from yahoo import get_article_text
+from yahoo import get_article_text, get_articles_first_time
 from vllm import get_free_talk
 from irodori import play_contents
 from openai import OpenAI
@@ -32,6 +32,8 @@ if __name__ == "__main__":
     ws.connect()
 
     with closing(sqlite3.Connection("./articles.db")) as conn:
+
+        get_articles_first_time()
 
         while True:
             try:
