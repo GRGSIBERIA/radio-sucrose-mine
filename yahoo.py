@@ -87,7 +87,7 @@ def get_one_offset_article(conn:sqlite3.Connection, offset:int):
         ORDER BY url
         LIMIT 1 OFFSET ?
         """,
-        (offset),
+        (offset,),
     ).fetchone()
 
 
